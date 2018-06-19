@@ -29,12 +29,49 @@ class ViewTestCase(TestCase):
     """API test client"""
     self.client = APIClient()
     self.bucketlist_data = {'name': 'Make a conversational AI'}
-    self.response = slef.client.post(
+    self.response = self.client.post(
       reverse('create'),
       self.bucketlist_data,
       format="json"
     )
   
   def test_api_create_bucketlist_item(self):
-    """Test API create"""
+    """Test API POST"""
     self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
+
+  def test_api_read_bucketlist_item(self):
+    """Test API GET"""
+    
+    bucketlist = BucketList.objects.get()
+    response = self.client.get(
+            reverse('details'),
+            kwargs={'pk': bucketlist.id}), format="json")
+    
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+    self.assertContains(response, bucketlist)
+
+
+  def test_api_update_bucketlist_item(self):
+    """Test API PUT"""
+    bucketlist = Bucketlist.objects.get()
+    change_bucketlist = {'name': 'Test new'}
+    response = self.client.put(
+            reverse('details'),
+            kwargs={'pk': bucketlist.id}), 
+            change_bucketlist,
+            format="json")
+    
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+  
+  def test_api_delete_bucketlist_item(self):
+    """Test API DELETE"""
+    
+    bucketlist = BucketList.objects.get()
+    response = self.client.put(
+            reverse('details'),
+            kwargs={'pk': bucketlist.id}), 
+            change_bucketlist,
+            format="json")
+    
+    self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
