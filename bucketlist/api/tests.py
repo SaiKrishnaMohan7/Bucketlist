@@ -4,6 +4,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 
 from .models import BucketList
 
@@ -12,8 +13,9 @@ class ModelTestCase(TestCase):
 
   def setUp(self):
     """Intial Setup, test client"""
-    self.bucketlist_name = 'Test Driven Dev'
-    self.bucketlist = BucketList(name=self.bucketlist_name)
+    user = User.objects.create(username='sai')
+    self.name = 'Test Driven Dev'
+    self.bucketlist = BucketList(name=self.name, owner=user)
   
   def test_model_can_create_bucketlist(self):
     """Test Bucketlist model"""
@@ -27,7 +29,9 @@ class ViewTestCase(TestCase):
 
   def setUp(self):
     """API test client"""
+    user = User.objects.create(username='sai')
     self.client = APIClient()
+    self.client.force_authenticate(user=user)
     self.bucketlist_data = {'name': 'Make a conversational AI'}
     self.response = self.client.post(
       reverse('create'),
